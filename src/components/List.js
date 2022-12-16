@@ -7,7 +7,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import React, { useEffect } from 'react';
 
-
 export default function List() {
     const [list, setList] = React.useState(null);
 
@@ -24,6 +23,9 @@ export default function List() {
 
     return (
         <>
+            { 
+                list == null && <p className='text-green-600 text-center py-4 font-bold text-3xl'>Loading.....</p>
+            }
             {
            list?.length > 0 ?  <TableContainer component={Paper} className='w-[99%] mx-auto'>
            <Table sx={{ minWidth: 650 }} aria-label="simple table">
