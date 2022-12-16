@@ -6,7 +6,8 @@ import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 function TabPanel(props) {
 
     const { children, value, index, ...other } = props;
@@ -45,7 +46,9 @@ export default function Form() {
     const [error, setError] = useState(null);
     const { register, formState: { errors }, handleSubmit } = useForm();
     const [data, setData] = useState("");
+    const [reload, setReload] = useState(false);
     const [value, setValue] = useState(0);
+    const navigate = useNavigate()
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -63,14 +66,28 @@ export default function Form() {
         feesAndCharges: ''
     })
 
+
+
     const insertData = (data) => {
-        console.log(formData)
-        console.log(data);
+        fetch(`${process.env.REACT_APP_server_api}/addapplication`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data?.acknowledged === true) {
+                    toast.success('Data insert successfully!');
+                    navigate('/applicationlist')
+                 
+                }
+            })         
     }
     const formDataSet = (e) => {
         const name = e.target.name;
         const value = e.target.value;
-        console.log(name, value);
         const preData = formData;
         preData[name] = value;
         setFormData(preData);
@@ -95,7 +112,7 @@ export default function Form() {
                 {/*  first tabs */}
                 <TabPanel value={value} index={0} className='flex flex-col w-[90%] max-w-[600px]  mx-auto'  >
                     <div className='flex flex-col justify-center mb-6'>
-                        <TextField onBlur={formDataSet} className='' id="outlined-basic" label="First Name" variant="outlined" name='firstName' defaultValue={formData.firstName} {...register("firstName", { required: "FirstName is required" })} />
+                        <TextField onBlur={formDataSet} className='' id="outlined-basic" label="First Name" variant="outlined" name='firstName' defaultValue={data?.firstName} {...register("firstName", { required: "FirstName is required" })} />
                         {
                             errors.firstName && <p className='text-red-500 my-1 '>{errors.firstName.message}*</p>
                         }
@@ -124,7 +141,7 @@ export default function Form() {
                         }
                     </div>
                     <div className='flex flex-col justify-center mb-6'>
-                        <TextField onBlur={formDataSet} className='w-[90%] max-w-[600px]' id="outlined-basic" label="Mobile number" variant="outlined" name='mobileNumber' defaultValue={formData.mobileNumber}
+                        <TextField onBlur={formDataSet} className='' id="outlined-basic" label="Mobile number" variant="outlined" name='mobileNumber' defaultValue={formData.mobileNumber}
                             {...register("mobileNumber", { required: "Mobile number is required" })}
                         />
                         {
@@ -178,8 +195,8 @@ export default function Form() {
                         }
                     </div>
                     <div className='flex flex-col justify-center mb-6'>
-                        <TextField onBlur={formDataSet} className=' ' id="outlined-basic" label="Interest Rate" type='text' variant="outlined" name='interestRate' defaultValue={formData.interestRate} 
- {...register("interestRate", { required: "Interest Rate is required" })}
+                        <TextField onBlur={formDataSet} className=' ' id="outlined-basic" label="Interest Rate" type='text' variant="outlined" name='interestRate' defaultValue={formData.interestRate}
+                            {...register("interestRate", { required: "Interest Rate is required" })}
 
                         />
                         {
@@ -187,23 +204,24 @@ export default function Form() {
                         }
                     </div>
                     <div className='flex flex-col justify-center mb-6'>
-                        <TextField onBlur={formDataSet} type='text' className='' id="outlined-basic" label="Loan Tenure" variant="outlined" name='loanTenure' defaultValue={formData.loanTenure} 
- {...register("loanTenure", { required: "Loan Tenure is required" })}
+                        <TextField onBlur={formDataSet} type='text' className='' id="outlined-basic" label="Loan Tenure" variant="outlined" name='loanTenure' defaultValue={formData.loanTenure}
+                            {...register("loanTenure", { required: "Loan Tenure is required" })}
                         />
                         {
                             errors.loanTenure && <p className='text-red-500 my-1 '>{errors.loanTenure.message}*</p>
                         }
                     </div>
                     <div className='flex flex-col justify-center mb-6'>
-                        <TextField onBlur={formDataSet} type='text' className=' ' id="outlined-basic" label="Fees & Charges" variant="outlined" name='feesAndCharges' defaultValue={formData.feesAndCharges} 
- {...register("feesAndCharges", { required: "Fees and Charges Rate is required" })}
+                        <TextField onBlur={formDataSet} type='text' className=' ' id="outlined-basic" label="Fees & Charges" variant="outlined" name='feesAndCharges' defaultValue={formData.feesAndCharges}
+                            {...register("feesAndCharges", { required: "Fees and Charges Rate is required" })}
                         />
                         {
                             errors.feesAndCharges && <p className='text-red-500 my-1 '>{errors.feesAndCharges.message}*</p>
                         }
                     </div>
+                    <p className='text-red-300 mb-2'>If the button doesn't work please check all the field.</p>
                     <div className='flex flex-col justify-center mb-6'>
-                        <Button type='submit' variant="contained" className='text-white bg-[#2196f3] px-6'>Submit</Button>
+                        <Button type='submit' variant="contained" className='text-white bg-[#2196f3] px-6' >Submit</Button>
                     </div>
 
                 </TabPanel>
